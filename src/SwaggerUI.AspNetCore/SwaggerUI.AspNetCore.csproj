@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <IsPackable>true</IsPackable>
+
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <!--Package-->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+
+    <Description>A swagger-ui dist package for aspnetcore. Let the aspnetcore program provide swagger-ui endpoint.</Description>
+
+    <Authors>stratos</Authors>
+
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/stratosblue/SwaggerUI.AspNetCore</PackageProjectUrl>
+
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+
+    <PackageTags>swagger swaggerui swagger-ui aspnet aspnetcore api openapi open-api webapi</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="/" />
+    <None Include="..\..\logo.png" Pack="True" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CompressedEmbeddedResource Include=".swagger_dist\package\**\*.js;.swagger_dist\package\**\*.html;.swagger_dist\package\**\*.css;.swagger_dist\package\**\*.png"
+                                Exclude=".swagger_dist\package\**\*es-bundle*.js;.swagger_dist\package\**\index.js;.swagger_dist\package\**\swagger-initializer.js;.swagger_dist\package\**\absolute-path.js"
+                                Link="swagger_dist\%(RecursiveDir)%(FileName)%(Extension)"
+                                Pack="false" />
+    <EmbeddedResource Include="swagger-initializer.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ResourceCompressor" Version="1.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="_FetchSwaggerUIDistributionFile" BeforeTargets="CheckForDuplicateItems">
+    <MakeDir Directories="$(IntermediateOutputPath)" Condition="!Exists('$(IntermediateOutputPath)')" />
+    <Exec WorkingDirectory="$(IntermediateOutputPath)/../"
+          Command="dotnet run -c Release --project $(MSBuildProjectDirectory)/../../tools/SwaggerUI.DistributionFileFetcher/SwaggerUI.DistributionFileFetcher.csproj $(SwaggerUIVersion) $(MSBuildProjectDirectory)/.swagger_dist">
+    </Exec>
+  </Target>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.*" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>
