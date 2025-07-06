@@ -16,6 +16,5 @@
     <SwaggerUIVersion>5.26.0</SwaggerUIVersion>
     <LibraryFixVersion>0</LibraryFixVersion>
     <VersionPrefix>$(SwaggerUIVersion).$(LibraryFixVersion)</VersionPrefix>
-    <VersionSuffix>preview-002</VersionSuffix>
   </PropertyGroup>
 </Project>

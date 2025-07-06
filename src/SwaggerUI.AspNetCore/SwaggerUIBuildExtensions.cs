@@ -36,11 +36,16 @@ public static class SwaggerUIBuildExtensions
 
     /// <summary>
     /// Map swagger-ui with http access path <paramref name="routePrefix"/> and use openapi doc endpoint url <paramref name="openApiEndpoint"/>
-    /// <br/>see openapi document: <a href="https://aka.ms/aspnet/openapi" />
+    /// <br/><br/>see openapi document: <a href="https://aka.ms/aspnet/openapi" />
+    /// <br/><br/>When use swagger. The <paramref name="openApiEndpoint"/> in default should be set as "/swagger/v1/swagger.json"
     /// </summary>
     /// <param name="app"></param>
     /// <param name="routePrefix">swagger-ui http access path</param>
-    /// <param name="openApiEndpoint">openapi doc endpoint url</param>
+    /// <param name="openApiEndpoint">
+    /// openapi doc endpoint url<br/>
+    /// <br/>Default value for Microsoft.AspNetCore.OpenApi is "/openapi/v1.json"
+    /// <br/>Default value for swagger is "/swagger/v1/swagger.json"
+    /// </param>
     /// <returns></returns>
     public static IApplicationBuilder MapSwaggerUI(this IApplicationBuilder app,
                                                    string routePrefix = SwaggerUIOptions.DefaultRoutePrefix,
