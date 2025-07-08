@@ -13,11 +13,15 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.x
+        dotnet-version: |
+          8.x
+          9.x
     - name: restore dependencies
       run: dotnet restore
     - name: build
       run: dotnet build --no-restore -c Release
+    - name: test
+      run: dotnet test --no-restore -c Release
     - name: pack
       run: dotnet pack -c Release -o ./output
     - name: push package
