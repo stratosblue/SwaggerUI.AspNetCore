@@ -6,6 +6,10 @@
     <IsPackable>true</IsPackable>
 
     <IsAotCompatible>true</IsAotCompatible>
+
+    <SignAssembly>True</SignAssembly>
+
+    <AssemblyOriginatorKeyFile>SwaggerUI.AspNetCore.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <!--Package-->
