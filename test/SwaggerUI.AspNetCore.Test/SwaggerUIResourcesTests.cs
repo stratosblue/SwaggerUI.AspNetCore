@@ -123,6 +123,7 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
 
             using var secondHtmlResponse = await client.SendAsync(requestMessage);
             Assert.AreEqual(HttpStatusCode.NotModified, secondHtmlResponse.StatusCode);
+            Assert.AreEqual(0, secondHtmlResponse.Content.ReadAsStream().Length);
 
             using var stream = await secondHtmlResponse.Content.ReadAsStreamAsync();
             Assert.AreEqual(0, stream.Length);
@@ -130,18 +131,4 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
     }
 
     #endregion Public 方法
-
-    #region Private 方法
-
-    private static List<(string ResourceName, string FileName)> GetEmbeddedUIFiles()
-    {
-        const string ResourcePrefix = "SwaggerUI.AspNetCore.Test.swagger_dist.";
-        return typeof(SwaggerUIResourcesTests).Assembly
-            .GetManifestResourceNames()
-            .Where(name => name.StartsWith(ResourcePrefix))
-            .Select(name => (name, name.Substring(ResourcePrefix.Length)))
-            .ToList();
-    }
-
-    #endregion Private 方法
 }

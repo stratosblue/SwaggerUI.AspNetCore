@@ -68,6 +68,16 @@ public abstract class TestServerBaseTest
 
     #region Protected 方法
 
+    protected static List<(string ResourceName, string FileName)> GetEmbeddedUIFiles()
+    {
+        const string ResourcePrefix = "SwaggerUI.AspNetCore.Test.swagger_dist.";
+        return typeof(SwaggerUIResourcesTests).Assembly
+            .GetManifestResourceNames()
+            .Where(name => name.StartsWith(ResourcePrefix))
+            .Select(name => (name, name.Substring(ResourcePrefix.Length)))
+            .ToList();
+    }
+
     protected virtual void ConfigureServices(IServiceCollection services)
     { }
 
