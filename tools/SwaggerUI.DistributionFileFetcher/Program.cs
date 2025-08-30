@@ -24,8 +24,9 @@ if (!File.Exists(packageCachePath))
     Console.WriteLine($"Start fetch {fetchUrl}");
 
     using var client = new HttpClient();
-    var packageData = await client.GetByteArrayAsync(fetchUrl);
-    File.WriteAllBytes(packageCachePath, packageData);
+    using var responseMessage = await client.GetAsync(fetchUrl, HttpCompletionOption.ResponseContentRead);
+    using var packageStream = await responseMessage.Content.ReadAsStreamAsync();
+    await WriteFileAsync(packageStream, packageCachePath);
 }
 
 if (string.IsNullOrWhiteSpace(outputDir))
@@ -59,8 +60,7 @@ try
         EnsureDirectory(entryOutputDir);
 
         using var entryStream = reader.OpenEntryStream();
-        using var fileStream = File.OpenWrite(entryOutputPath);
-        await entryStream.CopyToAsync(fileStream);
+        await WriteFileAsync(entryStream, entryOutputPath);
     }
 }
 catch
@@ -77,6 +77,43 @@ static void EnsureDirectory(string cacheDir)
 {
     if (!Directory.Exists(cacheDir))
     {
-        Directory.CreateDirectory(cacheDir);
+        try
+        {
+            Directory.CreateDirectory(cacheDir);
+        }
+        catch
+        {
+            if (Directory.Exists(cacheDir))
+            {
+                return;
+            }
+            throw;
+        }
+    }
+}
+
+static async Task WriteFileAsync(Stream stream, string filePath)
+{
+    const int RetryCount = 4;
+
+    //尝试在并行的情况下正常执行
+    for (var i = 1; i <= RetryCount; i++)
+    {
+        try
+        {
+            using var fileStream = File.OpenWrite(filePath);
+            await stream.CopyToAsync(fileStream);
+        }
+        catch
+        {
+            if (i == RetryCount)
+            {
+                throw;
+            }
+            else
+            {
+                Thread.Sleep(RetryCount * 100);
+            }
+        }
     }
 }

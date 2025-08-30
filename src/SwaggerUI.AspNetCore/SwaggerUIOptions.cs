@@ -27,6 +27,15 @@ public class SwaggerUIOptions
     public TimeSpan? CacheLifetime { get; set; } = TimeSpan.FromDays(1);
 
     /// <summary>
+    /// Options for enabling compression
+    /// <br/><see langword="null"/> - compression will be disabled only in the development environment.
+    /// <br/><see langword="true"/> - compression will always be enabled.
+    /// <br/><see langword="false"/> - compression will always be disabled.
+    /// <br/>default value is <see langword="null"/>
+    /// </summary>
+    public bool? CompressionEnabled { get; set; }
+
+    /// <summary>
     /// Custom javascript code snippet run before create swagger-ui.
     /// <br/>It will be embedded into 'swagger-initializer.js'
     /// </summary>

@@ -56,7 +56,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <Target Name="_FetchSwaggerUIDistributionFile" BeforeTargets="CheckForDuplicateItems">
+  <Target Name="_FetchSwaggerUIDistributionFile" BeforeTargets="DispatchToInnerBuilds">
     <MakeDir Directories="$(IntermediateOutputPath)" Condition="!Exists('$(IntermediateOutputPath)')" />
     <Exec WorkingDirectory="$(IntermediateOutputPath)/../"
           Command="dotnet run -c Release --project $(MSBuildProjectDirectory)/../../tools/SwaggerUI.DistributionFileFetcher/SwaggerUI.DistributionFileFetcher.csproj $(SwaggerUIVersion) $(MSBuildProjectDirectory)/.swagger_dist">

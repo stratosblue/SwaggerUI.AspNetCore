@@ -18,6 +18,8 @@ internal sealed class CompressedEmbeddedFileResponder
 
     private readonly StringValues _cacheControlHeaderValue;
 
+    private readonly bool _compressionEnabled;
+
     private readonly StringValues _gzipStringValues = "gzip";
 
     private readonly FrozenDictionary<string, ResourceIndexCache> _resourceIndexes;
@@ -26,10 +28,14 @@ internal sealed class CompressedEmbeddedFileResponder
 
     #region Public 构造函数
 
-    public CompressedEmbeddedFileResponder(Assembly assembly, string resourceNamePrefix, TimeSpan? cacheLifetime)
+    public CompressedEmbeddedFileResponder(Assembly assembly,
+                                           string resourceNamePrefix,
+                                           TimeSpan? cacheLifetime,
+                                           bool compressionEnabled)
     {
         _assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
         _cacheControlHeaderValue = GetCacheControlHeaderValue(cacheLifetime);
+        _compressionEnabled = compressionEnabled;
 
         var resourceNames = assembly.GetManifestResourceNames()
                                     .Where(name => name.StartsWith(resourceNamePrefix, StringComparison.Ordinal));
@@ -94,7 +100,9 @@ internal sealed class CompressedEmbeddedFileResponder
 
         var responseHeaders = httpContext.Response.Headers;
 
-        var responseWithGZip = httpContext.IsGZipAccepted();
+        var responseWithGZip = _compressionEnabled
+                               && httpContext.IsGZipAccepted();
+
         if (responseWithGZip)
         {
             responseHeaders.ContentEncoding = _gzipStringValues;

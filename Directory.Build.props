@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -13,7 +13,7 @@
 
   <!--Version-->
   <PropertyGroup>
-    <SwaggerUIVersion>5.27.1</SwaggerUIVersion>
+    <SwaggerUIVersion>5.28.0</SwaggerUIVersion>
     <LibraryFixVersion>0</LibraryFixVersion>
     <VersionPrefix>$(SwaggerUIVersion).$(LibraryFixVersion)</VersionPrefix>
   </PropertyGroup>

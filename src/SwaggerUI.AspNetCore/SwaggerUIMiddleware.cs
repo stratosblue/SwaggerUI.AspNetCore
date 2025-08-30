@@ -2,6 +2,7 @@
 using System.Text;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 
 using SwaggerUI.AspNetCore.Internal;
@@ -26,15 +27,21 @@ internal sealed class SwaggerUIMiddleware
 
     #region Public 构造函数
 
-    public SwaggerUIMiddleware(RequestDelegate next, SwaggerUIOptions options)
+    public SwaggerUIMiddleware(RequestDelegate next, SwaggerUIOptions options, IHostEnvironment hostEnvironment)
     {
         ArgumentNullException.ThrowIfNull(next);
         ArgumentNullException.ThrowIfNull(options);
 
         _next = next;
+        var compressionEnabled = options.CompressionEnabled is null
+                                 ? !hostEnvironment.IsDevelopment()
+                                 : options.CompressionEnabled.Value;
 
         var assembly = typeof(SwaggerUIMiddleware).Assembly;
-        _compressedEmbeddedFileResponder = new(assembly, EmbeddedFileNamespace, options.CacheLifetime);
+        _compressedEmbeddedFileResponder = new(assembly: assembly,
+                                               resourceNamePrefix: EmbeddedFileNamespace,
+                                               cacheLifetime: options.CacheLifetime,
+                                               compressionEnabled: compressionEnabled);
 
         var initializerJSCode = GenerateInitializerJSCode(options, assembly);
 
