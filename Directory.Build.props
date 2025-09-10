@@ -13,7 +13,7 @@
 
   <!--Version-->
   <PropertyGroup>
-    <SwaggerUIVersion>5.28.1</SwaggerUIVersion>
+    <SwaggerUIVersion>5.29.0</SwaggerUIVersion>
     <LibraryFixVersion>0</LibraryFixVersion>
     <VersionPrefix>$(SwaggerUIVersion).$(LibraryFixVersion)</VersionPrefix>
   </PropertyGroup>
