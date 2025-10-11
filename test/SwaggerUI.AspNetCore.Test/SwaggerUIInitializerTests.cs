@@ -39,9 +39,9 @@ public class SwaggerUIInitializerTests : TestServerBaseTest
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
 
-        Assert.IsTrue(content.Contains("http://test.com/api.json"));
-        Assert.IsTrue(content.Contains("//TestCustomConfigurationObject"));
-        Assert.IsTrue(content.Contains("//CustomCodeBeforeInitialization"));
+        Assert.Contains("http://test.com/api.json", content);
+        Assert.Contains("//TestCustomConfigurationObject", content);
+        Assert.Contains("//CustomCodeBeforeInitialization", content);
     }
 
     #endregion Public 方法
