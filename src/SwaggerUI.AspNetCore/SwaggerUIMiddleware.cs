@@ -116,7 +116,7 @@ internal sealed class SwaggerUIMiddleware
                                   """;
 
         var customCodeBeforeInitialization = options.CustomCodeBeforeInitialization ?? string.Empty;
-        var customConfigurationSnippet = $"customOptions = {options.CustomConfigurationObject ?? "{}"};";
+        var customConfigurationSnippet = $"customOptions = {options.CustomConfigurationObject ?? "{}"} ?? {{}};";
 
         var initializerJSCode = initializerScriptTemplate.Replace("/** OptionsSetupSnippet */", optionsSetupSnippet, StringComparison.Ordinal)
                                                          .Replace("/** CustomCodeBeforeInitialization */", customCodeBeforeInitialization, StringComparison.Ordinal)

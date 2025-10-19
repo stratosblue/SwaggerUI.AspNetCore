@@ -1,4 +1,8 @@
-﻿namespace SwaggerUI.AspNetCore;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
+namespace SwaggerUI.AspNetCore;
 
 /// <summary>
 /// swagger ui options
@@ -18,6 +22,12 @@ public class SwaggerUIOptions
     public const string DefaultRoutePrefix = "/swagger";
 
     #endregion Public 字段
+
+    #region Private 字段
+
+    private string? _customConfigurationObject;
+
+    #endregion Private 字段
 
     #region Public 属性
 
@@ -58,7 +68,37 @@ public class SwaggerUIOptions
     /// <br/>  ]
     /// <br/>}
     /// </summary>
-    public string? CustomConfigurationObject { get; set; }
+    [StringSyntax(StringSyntaxAttribute.Json)]
+    public string? CustomConfigurationObject
+    {
+        get => _customConfigurationObject;
+        set
+        {
+            var newValue = value;
+
+            if (string.IsNullOrWhiteSpace(newValue))
+            {
+                newValue = null;
+            }
+
+            if (newValue != null
+                && !string.Equals("null", newValue, StringComparison.Ordinal))
+            {
+                try
+                {
+                    if (JsonNode.Parse(newValue, documentOptions: new() { CommentHandling = JsonCommentHandling.Skip }) is not JsonObject)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+                catch
+                {
+                    throw new ArgumentException($"\"{nameof(CustomConfigurationObject)}\" must be a json object.");
+                }
+            }
+            _customConfigurationObject = newValue;
+        }
+    }
 
     /// <summary>
     /// openapi doc endpoints.
