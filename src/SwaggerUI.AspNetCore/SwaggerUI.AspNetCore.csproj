@@ -30,7 +30,7 @@
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
 
     <PackageTags>swagger swaggerui swagger-ui aspnet aspnetcore api openapi open-api webapi</PackageTags>
-  </PropertyGroup>
+</PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="/" />
@@ -42,8 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <CompressedEmbeddedResource Include=".swagger_dist\package\**\*.js;.swagger_dist\package\**\*.html;.swagger_dist\package\**\*.css;.swagger_dist\package\**\*.png"
-                                Exclude=".swagger_dist\package\**\*es-bundle*.js;.swagger_dist\package\**\index.js;.swagger_dist\package\**\swagger-initializer.js;.swagger_dist\package\**\absolute-path.js"
+    <CompressedEmbeddedResource Include="$(SwaggerUIDistPath)\package\**\*.js;$(SwaggerUIDistPath)\package\**\*.html;$(SwaggerUIDistPath)\package\**\*.css;$(SwaggerUIDistPath)\package\**\*.png"
+                                Exclude="$(SwaggerUIDistPath)\package\**\*es-bundle*.js;$(SwaggerUIDistPath)\package\**\index.js;$(SwaggerUIDistPath)\package\**\swagger-initializer.js;$(SwaggerUIDistPath)\package\**\absolute-path.js"
                                 Link="swagger_dist\%(RecursiveDir)%(FileName)%(Extension)"
                                 Pack="false" />
     <EmbeddedResource Include="swagger-initializer.js" />
@@ -59,7 +59,7 @@
   <Target Name="_FetchSwaggerUIDistributionFile" BeforeTargets="DispatchToInnerBuilds">
     <MakeDir Directories="$(IntermediateOutputPath)" Condition="!Exists('$(IntermediateOutputPath)')" />
     <Exec WorkingDirectory="$(IntermediateOutputPath)/../"
-          Command="dotnet run -c Release --project $(MSBuildProjectDirectory)/../../tools/SwaggerUI.DistributionFileFetcher/SwaggerUI.DistributionFileFetcher.csproj $(SwaggerUIVersion) $(MSBuildProjectDirectory)/.swagger_dist">
+          Command="dotnet run -c Release --project $(MSBuildProjectDirectory)/../../tools/SwaggerUI.DistributionFileFetcher/SwaggerUI.DistributionFileFetcher.csproj $(SwaggerUIVersion) $(MSBuildProjectDirectory)/$(SwaggerUIDistPath)">
     </Exec>
   </Target>
 

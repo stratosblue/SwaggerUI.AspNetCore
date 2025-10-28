@@ -13,8 +13,10 @@
 
   <!--Version-->
   <PropertyGroup>
-    <SwaggerUIVersion>5.29.5</SwaggerUIVersion>
+    <SwaggerUIVersion>5.30.0</SwaggerUIVersion>
     <LibraryFixVersion>0</LibraryFixVersion>
     <VersionPrefix>$(SwaggerUIVersion).$(LibraryFixVersion)</VersionPrefix>
+
+    <SwaggerUIDistPath>.swagger_dist/$(SwaggerUIVersion)</SwaggerUIDistPath>
   </PropertyGroup>
 </Project>
