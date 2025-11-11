@@ -1,0 +1,37 @@
+﻿name: Check for swagger-ui-dist updates
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 'latest'
+
+    - name: Check for swagger-ui-dist packages
+      run: echo "SWAGGER_UI_DIST_VERSION=$(npm view swagger-ui-dist version)" >> $GITHUB_ENV
+
+    - name: Check for current swagger-ui-dist packages
+      run: echo "CURRENT_SWAGGER_UI_DIST_VERSION=$(grep -oP '\<SwaggerUIVersion\>[\d\.]+\</SwaggerUIVersion\>' Directory.Build.props | grep -oP '[\d\.]+')" >> $GITHUB_ENV
+
+    - name: Update current version
+      if: env.SWAGGER_UI_DIST_VERSION != env.CURRENT_SWAGGER_UI_DIST_VERSION
+      run: sed -i 's/<SwaggerUIVersion>${{ env.CURRENT_SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>/<SwaggerUIVersion>${{ env.SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>/g' Directory.Build.props
+      
+    - name: Create Pull Request if version not match
+      if: env.SWAGGER_UI_DIST_VERSION != env.CURRENT_SWAGGER_UI_DIST_VERSION
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "feat: swagger-ui ${{ env.SWAGGER_UI_DIST_VERSION }}"
+        title: "Update swagger-ui-dist version to ${{ env.SWAGGER_UI_DIST_VERSION }}"
+        body: "This PR updates the package swagger-ui-dist based on automated checks."
+        branch: automated-swagger-ui-dist-updates
