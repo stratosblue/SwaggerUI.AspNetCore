@@ -10,6 +10,11 @@
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/solution items/.github/" />
+  <Folder Name="/solution items/.github/workflows/">
+    <File Path=".github/workflows/PublishNugetPackage.yml" />
+    <File Path=".github/workflows/swagger_ui_dist_package_check.yml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/SwaggerUI.AspNetCore/SwaggerUI.AspNetCore.csproj" />
   </Folder>

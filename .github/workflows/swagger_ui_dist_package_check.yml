@@ -7,6 +7,11 @@ on:
 jobs:
   check-updates:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -24,7 +29,7 @@ jobs:
 
     - name: Update current version
       if: env.SWAGGER_UI_DIST_VERSION != env.CURRENT_SWAGGER_UI_DIST_VERSION
-      run: sed -i 's/<SwaggerUIVersion>${{ env.CURRENT_SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>/<SwaggerUIVersion>${{ env.SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>/g' Directory.Build.props
+      run: sed -i 's|<SwaggerUIVersion>${{ env.CURRENT_SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>|<SwaggerUIVersion>${{ env.SWAGGER_UI_DIST_VERSION }}</SwaggerUIVersion>|g' Directory.Build.props && sed -i 's|<LibraryFixVersion>[0-9]*</LibraryFixVersion>|<LibraryFixVersion>0</LibraryFixVersion>|g' Directory.Build.props
       
     - name: Create Pull Request if version not match
       if: env.SWAGGER_UI_DIST_VERSION != env.CURRENT_SWAGGER_UI_DIST_VERSION
