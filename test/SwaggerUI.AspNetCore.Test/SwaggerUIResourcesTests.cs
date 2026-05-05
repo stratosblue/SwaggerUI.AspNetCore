@@ -44,7 +44,7 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
     {
         using var client = GetTestHttpClient();
 
-        using var response = await client.GetAsync(GetResourceFullPath(resourcePath));
+        using var response = await client.GetAsync(GetResourceFullPath(resourcePath), TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         Assert.IsNotNull(response.Headers.ETag);
@@ -66,10 +66,10 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
         foreach (var (resourceName, fileName) in embeddedUIFiles)
         {
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
-            using var htmlResponse = await client.SendAsync(requestMessage);
+            using var htmlResponse = await client.SendAsync(requestMessage, TestContext.CancellationToken);
             Assert.AreEqual(HttpStatusCode.OK, htmlResponse.StatusCode);
 
-            using var stream = await htmlResponse.Content.ReadAsStreamAsync();
+            using var stream = await htmlResponse.Content.ReadAsStreamAsync(TestContext.CancellationToken);
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
             Assert.IsNotNull(diskFileStream);
@@ -90,12 +90,12 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
             requestMessage.Headers.AcceptEncoding.Add(new("gzip"));
 
-            using var htmlResponse = await client.SendAsync(requestMessage);
+            using var htmlResponse = await client.SendAsync(requestMessage, TestContext.CancellationToken);
 
             Assert.AreEqual(HttpStatusCode.OK, htmlResponse.StatusCode);
             Assert.AreEqual("gzip", htmlResponse.Content.Headers.ContentEncoding.Single());
 
-            using var stream = await htmlResponse.Content.ReadAsStreamAsync();
+            using var stream = await htmlResponse.Content.ReadAsStreamAsync(TestContext.CancellationToken);
             using var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
@@ -114,21 +114,22 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
 
         foreach (var (_, fileName) in embeddedUIFiles)
         {
-            using var htmlResponse = await client.GetAsync(GetResourceFullPath(fileName));
+            using var htmlResponse = await client.GetAsync(GetResourceFullPath(fileName), TestContext.CancellationToken);
             Assert.AreEqual(HttpStatusCode.OK, htmlResponse.StatusCode);
             Assert.IsNotNull(htmlResponse.Headers.ETag?.Tag);
 
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
             requestMessage.Headers.IfNoneMatch.Add(new(htmlResponse.Headers.ETag.Tag));
 
-            using var secondHtmlResponse = await client.SendAsync(requestMessage);
+            using var secondHtmlResponse = await client.SendAsync(requestMessage, TestContext.CancellationToken);
             Assert.AreEqual(HttpStatusCode.NotModified, secondHtmlResponse.StatusCode);
-            Assert.AreEqual(0, secondHtmlResponse.Content.ReadAsStream().Length);
+            Assert.AreEqual(0, secondHtmlResponse.Content.ReadAsStream(TestContext.CancellationToken).Length);
 
-            using var stream = await secondHtmlResponse.Content.ReadAsStreamAsync();
+            using var stream = await secondHtmlResponse.Content.ReadAsStreamAsync(TestContext.CancellationToken);
             Assert.AreEqual(0, stream.Length);
         }
     }
+
 
     #endregion Public 方法
 }

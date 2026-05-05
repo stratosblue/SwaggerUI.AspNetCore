@@ -33,10 +33,10 @@ public class SwaggerUIEntryPointTests : TestServerBaseTest
     {
         using var client = GetTestHttpClient();
 
-        using var response = await client.GetAsync($"/{Guid.NewGuid()}");
+        using var response = await client.GetAsync($"/{Guid.NewGuid()}", TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual(FallbackResponseContent, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(FallbackResponseContent, await response.Content.ReadAsStringAsync(TestContext.CancellationToken));
     }
 
     [TestMethod]
@@ -46,11 +46,12 @@ public class SwaggerUIEntryPointTests : TestServerBaseTest
     {
         using var client = GetTestHttpClient();
 
-        using var response = await client.GetAsync($"{RoutePrefix}{requestPathSuffix}");
+        using var response = await client.GetAsync($"{RoutePrefix}{requestPathSuffix}", TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.MovedPermanently, response.StatusCode);
         Assert.AreEqual($"{RoutePrefix}/index.html", response.Headers.Location?.ToString());
     }
+
 
     #endregion Public 方法
 }

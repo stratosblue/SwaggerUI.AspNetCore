@@ -1,4 +1,6 @@
-﻿namespace SwaggerUI.AspNetCore.Test;
+﻿using System.Text.Json;
+
+namespace SwaggerUI.AspNetCore.Test;
 
 [TestClass]
 public class SwaggerUIOptionsTests
@@ -17,8 +19,32 @@ public class SwaggerUIOptionsTests
     public void Should_Set_CustomConfigurationObject_Fail(string value)
     {
         var options = new SwaggerUIOptions();
-        Assert.ThrowsExactly<ArgumentException>(() => options.CustomConfigurationObject = value);
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => options.CustomConfigurationObject = value);
+
+        Assert.AreEqual(nameof(SwaggerUIOptions.CustomConfigurationObject), exception.ParamName);
         Assert.IsNull(options.CustomConfigurationObject);
+    }
+
+    [TestMethod]
+    public void Should_Set_CustomConfigurationObject_Fail_WithInvalidOperationExceptionAsInnerException_WhenJsonIsNotObject()
+    {
+        var options = new SwaggerUIOptions();
+
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => options.CustomConfigurationObject = "[]");
+
+        Assert.AreEqual(nameof(SwaggerUIOptions.CustomConfigurationObject), exception.ParamName);
+        Assert.IsInstanceOfType<InvalidOperationException>(exception.InnerException);
+    }
+
+    [TestMethod]
+    public void Should_Set_CustomConfigurationObject_Fail_WithJsonExceptionAsInnerException()
+    {
+        var options = new SwaggerUIOptions();
+
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => options.CustomConfigurationObject = "{\"property\":value}");
+
+        Assert.AreEqual(nameof(SwaggerUIOptions.CustomConfigurationObject), exception.ParamName);
+        Assert.IsInstanceOfType<JsonException>(exception.InnerException);
     }
 
     [TestMethod]

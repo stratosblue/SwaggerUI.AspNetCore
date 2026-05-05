@@ -21,10 +21,13 @@ public static class SwaggerUIBuildExtensions
     /// <returns></returns>
     public static IApplicationBuilder MapSwaggerUI(this IApplicationBuilder app, Action<SwaggerUIOptions> optionsSetup)
     {
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(optionsSetup);
+
         var options = new SwaggerUIOptions();
         optionsSetup(options);
 
-        var routePrefix = string.IsNullOrWhiteSpace(options.RoutePrefix) ? SwaggerUIOptions.DefaultRoutePrefix : options.RoutePrefix;
+        var routePrefix = NormalizeRoutePrefix(options.RoutePrefix);
 
         app.Map(routePrefix, swaggerUIApp =>
         {
@@ -51,12 +54,34 @@ public static class SwaggerUIBuildExtensions
                                                    string routePrefix = SwaggerUIOptions.DefaultRoutePrefix,
                                                    string openApiEndpoint = SwaggerUIOptions.DefaultOpenApiEndpoint)
     {
+        ArgumentNullException.ThrowIfNull(app);
+
         return app.MapSwaggerUI(options =>
         {
-            options.RoutePrefix = routePrefix;
+            options.RoutePrefix = NormalizeRoutePrefix(routePrefix);
             options.OpenApiEndpoints.Add(new(openApiEndpoint, null));
         });
     }
 
     #endregion Public 方法
+
+    #region Private 方法
+
+    private static string NormalizeRoutePrefix(string? routePrefix)
+    {
+        routePrefix = string.IsNullOrWhiteSpace(routePrefix)
+                      ? SwaggerUIOptions.DefaultRoutePrefix
+                      : routePrefix.Trim();
+
+        if (!routePrefix.StartsWith('/'))
+        {
+            routePrefix = $"/{routePrefix}";
+        }
+
+        return routePrefix.Length == 1
+               ? routePrefix
+               : routePrefix.TrimEnd('/');
+    }
+
+    #endregion Private 方法
 }

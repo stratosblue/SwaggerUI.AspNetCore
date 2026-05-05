@@ -88,12 +88,12 @@ public class SwaggerUIOptions
                 {
                     if (JsonNode.Parse(newValue, documentOptions: new() { CommentHandling = JsonCommentHandling.Skip }) is not JsonObject)
                     {
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException($"\"{newValue}\" is not a json object.");
                     }
                 }
-                catch
+                catch (Exception exception)
                 {
-                    throw new ArgumentException($"\"{nameof(CustomConfigurationObject)}\" must be a json object.");
+                    throw new ArgumentException($"\"{nameof(CustomConfigurationObject)}\" must be a json object.", nameof(CustomConfigurationObject), exception);
                 }
             }
             _customConfigurationObject = newValue;

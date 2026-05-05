@@ -29,12 +29,18 @@ public abstract class TestServerBaseTest
 
     #endregion Protected 属性
 
+    #region Public 属性
+
+    public TestContext TestContext { get; set; } = null!;
+
+    #endregion Public 属性
+
     #region Public 方法
 
     [TestCleanup]
     public async Task TestCleanupAsync()
     {
-        await WebApplication.StopAsync();
+        await WebApplication.StopAsync(TestContext.CancellationToken);
         await ServiceScope.DisposeAsync();
     }
 
@@ -53,10 +59,10 @@ public abstract class TestServerBaseTest
 
         WebApplication.Use(async (HttpContext context, RequestDelegate _) =>
         {
-            await context.Response.WriteAsync(FallbackResponseContent);
+            await context.Response.WriteAsync(FallbackResponseContent, TestContext.CancellationToken);
         });
 
-        await WebApplication.StartAsync();
+        await WebApplication.StartAsync(TestContext.CancellationToken);
 
         TestServer = WebApplication.GetTestServer();
 

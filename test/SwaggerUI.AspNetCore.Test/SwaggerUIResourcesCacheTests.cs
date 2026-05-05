@@ -53,7 +53,7 @@ public class SwaggerUIResourcesCacheTests : TestServerBaseTest
     {
         using var client = GetTestHttpClient();
 
-        using var response = await client.GetAsync(GetResourceFullPath(resourcePath));
+        using var response = await client.GetAsync(GetResourceFullPath(resourcePath), TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         Assert.IsNotNull(response.Headers.ETag);
@@ -76,6 +76,7 @@ public class SwaggerUIResourcesCacheTests : TestServerBaseTest
             options.CacheLifetime = CacheLifetime;
         });
     }
+
 
     #endregion Protected 方法
 }

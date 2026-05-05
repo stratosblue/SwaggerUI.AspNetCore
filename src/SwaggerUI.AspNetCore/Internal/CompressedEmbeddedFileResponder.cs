@@ -1,4 +1,5 @@
-﻿using System.Collections.Frozen;
+﻿using System.Buffers;
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Reflection;
@@ -34,6 +35,7 @@ internal sealed class CompressedEmbeddedFileResponder
                                            bool compressionEnabled)
     {
         _assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
+        ArgumentException.ThrowIfNullOrWhiteSpace(resourceNamePrefix);
         _cacheControlHeaderValue = GetCacheControlHeaderValue(cacheLifetime);
         _compressionEnabled = compressionEnabled;
 
@@ -161,16 +163,22 @@ internal sealed class CompressedEmbeddedFileResponder
         }
 
         using var stream = OpenResourceStream(resourceIndexCache);
-
-        using var memoryStream = new MemoryStream((int)stream.Length * 2);
         using var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
-        gzipStream.CopyTo(memoryStream);
-        memoryStream.Seek(0, SeekOrigin.Begin);
+        using var hashAlgorithm = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
+        using var bufferOwner = MemoryPool<byte>.Shared.Rent(16 * 1024);
 
-        resourceIndexCache.DecompressContentLength = memoryStream.Length;
+        var buffer = bufferOwner.Memory.Span;
+        var contentLength = 0;
+        int bytesRead;
+        while ((bytesRead = gzipStream.Read(buffer)) > 0)
+        {
+            contentLength += bytesRead;
+            hashAlgorithm.AppendData(buffer.Slice(0, bytesRead));
+        }
 
-        var hashData = MD5.HashData(memoryStream);
+        resourceIndexCache.DecompressContentLength = contentLength;
 
+        var hashData = hashAlgorithm.GetHashAndReset();
         resourceIndexCache.ETag = $"\"{Convert.ToBase64String(hashData)}\"";
 
         return (resourceIndexCache.ETag.Value, resourceIndexCache.DecompressContentLength.Value);

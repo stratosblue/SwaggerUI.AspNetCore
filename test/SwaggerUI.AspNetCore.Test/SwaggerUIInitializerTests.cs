@@ -34,10 +34,10 @@ public class SwaggerUIInitializerTests : TestServerBaseTest
     {
         using var client = GetTestHttpClient();
 
-        using var response = await client.GetAsync(GetResourceFullPath("swagger-initializer.js"));
+        using var response = await client.GetAsync(GetResourceFullPath("swagger-initializer.js"), TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
 
         Assert.Contains("http://test.com/api.json", content);
         Assert.Contains("//TestCustomConfigurationObject", content);
@@ -67,6 +67,7 @@ public class SwaggerUIInitializerTests : TestServerBaseTest
             """;
         });
     }
+
 
     #endregion Protected 方法
 }

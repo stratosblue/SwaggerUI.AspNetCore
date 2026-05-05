@@ -24,12 +24,12 @@ public class SwaggerUIResourceNonCompressionTests : TestServerBaseTest
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
             requestMessage.Headers.AcceptEncoding.Add(new("gzip"));
 
-            using var htmlResponse = await client.SendAsync(requestMessage);
+            using var htmlResponse = await client.SendAsync(requestMessage, TestContext.CancellationToken);
 
             Assert.AreEqual(HttpStatusCode.OK, htmlResponse.StatusCode);
             Assert.IsEmpty(htmlResponse.Content.Headers.ContentEncoding);
 
-            using var stream = await htmlResponse.Content.ReadAsStreamAsync();
+            using var stream = await htmlResponse.Content.ReadAsStreamAsync(TestContext.CancellationToken);
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
             Assert.IsNotNull(diskFileStream);
@@ -50,7 +50,7 @@ public class SwaggerUIResourceNonCompressionTests : TestServerBaseTest
             using var requestMessage1 = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
             requestMessage1.Headers.AcceptEncoding.Add(new("gzip"));
 
-            using var htmlResponse = await client.SendAsync(requestMessage1);
+            using var htmlResponse = await client.SendAsync(requestMessage1, TestContext.CancellationToken);
             Assert.AreEqual(HttpStatusCode.OK, htmlResponse.StatusCode);
             Assert.IsEmpty(htmlResponse.Content.Headers.ContentEncoding);
             Assert.IsNotNull(htmlResponse.Headers.ETag?.Tag);
@@ -58,11 +58,11 @@ public class SwaggerUIResourceNonCompressionTests : TestServerBaseTest
             using var requestMessage2 = new HttpRequestMessage(HttpMethod.Get, GetResourceFullPath(fileName));
             requestMessage2.Headers.IfNoneMatch.Add(new(htmlResponse.Headers.ETag.Tag));
 
-            using var secondHtmlResponse = await client.SendAsync(requestMessage2);
+            using var secondHtmlResponse = await client.SendAsync(requestMessage2, TestContext.CancellationToken);
             Assert.AreEqual(HttpStatusCode.NotModified, secondHtmlResponse.StatusCode);
-            Assert.AreEqual(0, secondHtmlResponse.Content.ReadAsStream().Length);
+            Assert.AreEqual(0, secondHtmlResponse.Content.ReadAsStream(TestContext.CancellationToken).Length);
 
-            using var stream = await secondHtmlResponse.Content.ReadAsStreamAsync();
+            using var stream = await secondHtmlResponse.Content.ReadAsStreamAsync(TestContext.CancellationToken);
             Assert.AreEqual(0, stream.Length);
         }
     }
@@ -79,6 +79,7 @@ public class SwaggerUIResourceNonCompressionTests : TestServerBaseTest
             options.CompressionEnabled = false;
         });
     }
+
 
     #endregion Private 方法
 }
