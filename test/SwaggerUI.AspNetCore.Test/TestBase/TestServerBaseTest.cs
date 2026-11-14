@@ -47,7 +47,7 @@ public abstract class TestServerBaseTest
     [TestInitialize]
     public async Task TestInitializeAsync()
     {
-        var builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
 
         builder.WebHost.UseTestServer();
 

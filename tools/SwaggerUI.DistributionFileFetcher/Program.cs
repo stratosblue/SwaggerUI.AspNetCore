@@ -41,7 +41,7 @@ try
 {
     //System.Formats.Tar.TarReader unsupported read now
 
-    using var reader = SharpCompress.Readers.Tar.TarReader.Open(File.OpenRead(packageCachePath));
+    using var reader = SharpCompress.Readers.Tar.TarReader.OpenReader(File.OpenRead(packageCachePath));
     while (reader.MoveToNextEntry()
            && reader.Entry is { } entry
            && !string.IsNullOrWhiteSpace(entry.Key)

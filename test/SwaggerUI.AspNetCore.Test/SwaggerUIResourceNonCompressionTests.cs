@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using System.Net;
+﻿using System.Net;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Builder;
 using SwaggerUI.AspNetCore.Test.TestBase;
@@ -33,7 +32,7 @@ public class SwaggerUIResourceNonCompressionTests : TestServerBaseTest
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
             Assert.IsNotNull(diskFileStream);
-            CollectionAssert.AreEqual(MD5.HashData(diskFileStream), MD5.HashData(stream));
+            Assert.AreSequenceEqual(MD5.HashData(diskFileStream), MD5.HashData(stream));
         }
     }
 

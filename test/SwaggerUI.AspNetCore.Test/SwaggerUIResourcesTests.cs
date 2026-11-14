@@ -73,7 +73,7 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
             Assert.IsNotNull(diskFileStream);
-            CollectionAssert.AreEqual(MD5.HashData(diskFileStream), MD5.HashData(stream));
+            Assert.AreSequenceEqual(MD5.HashData(diskFileStream), MD5.HashData(stream));
         }
     }
 
@@ -100,7 +100,7 @@ public class SwaggerUIResourcesTests : TestServerBaseTest
             using var diskFileStream = typeof(SwaggerUIResourcesTests).Assembly.GetManifestResourceStream(resourceName);
 
             Assert.IsNotNull(diskFileStream);
-            CollectionAssert.AreEqual(MD5.HashData(diskFileStream), MD5.HashData(gzipStream));
+            Assert.AreSequenceEqual(MD5.HashData(diskFileStream), MD5.HashData(gzipStream));
         }
     }
 
