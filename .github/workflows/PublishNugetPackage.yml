@@ -3,7 +3,6 @@
 on:
   release:
     types: [ released, prereleased ]
-    branches: [ main ]
 
 jobs:
   publish-with-build:

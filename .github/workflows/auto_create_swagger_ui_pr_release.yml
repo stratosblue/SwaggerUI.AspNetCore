@@ -1,0 +1,51 @@
+﻿name: Auto Release on Swagger UI PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-release:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'automated-swagger-ui-dist-updates-')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout merged code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+            11.x
+      - name: restore dependencies
+        run: dotnet restore
+      - name: build
+        run: dotnet build --no-restore -c Release
+      - name: test
+        run: dotnet test --no-restore -c Release
+
+      - name: Extract Full Version
+        run: |
+          SWAGGER_VERSION=$(grep -oP '(?<=<SwaggerUIVersion>)[\d\.]+(?=</SwaggerUIVersion>)' Directory.Build.props)
+          FIX_VERSION=$(grep -oP '(?<=<LibraryFixVersion>)\d+(?=</LibraryFixVersion>)' Directory.Build.props)
+          FULL_VERSION="${SWAGGER_VERSION}.${FIX_VERSION}"
+          echo "RELEASE_VERSION=$FULL_VERSION" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          tag_name: v${{ env.RELEASE_VERSION }}
+          name: v${{ env.RELEASE_VERSION }}
+          body: |
+            Automated release for `swagger-ui-dist` **${{ env.RELEASE_VERSION }}**.
+            Merged from PR #${{ github.event.pull_request.number }}.
+          generate_release_notes: true
